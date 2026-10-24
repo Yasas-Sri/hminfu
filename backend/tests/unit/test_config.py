@@ -26,3 +26,8 @@ def test_env_overrides_use_app_prefix(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_invalid_settings_are_rejected(kw: dict[str, object], msg: str) -> None:
     with pytest.raises(ValidationError, match=msg):
         Settings(**kw)
+
+
+def test_window_whole_hour_is_checked_in_utc() -> None:
+    with pytest.raises(ValidationError, match="whole hours"):
+        Settings(window_start="2026-01-02T05:00:00+05:30")

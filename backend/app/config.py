@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _window_is_whole_hours_and_ordered(self) -> "Settings":
-        for t in (self.window_start, self.window_end):
+        for t in (self.window_start.astimezone(UTC), self.window_end.astimezone(UTC)):
             if (t.minute, t.second, t.microsecond) != (0, 0, 0):
                 raise ValueError(f"window bounds must be whole hours, got {t.isoformat()}")
         if self.window_start >= self.window_end:

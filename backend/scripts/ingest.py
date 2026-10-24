@@ -19,7 +19,6 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
-from zoneinfo import ZoneInfo
 
 import httpx
 import pandas as pd
@@ -28,8 +27,8 @@ from app.config import Settings
 from app.data import validation as v
 from app.data.elexon_client import ElexonClient, Row
 from app.data.repository import read_rows, write_rows
+from app.domain.timeutils import delivery_day
 
-LONDON = ZoneInfo("Europe/London")
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "snapshot"
 
 
@@ -46,8 +45,7 @@ def forecast_publish_range(s: Settings) -> tuple[datetime, datetime]:
 
 def actual_settlement_days(s: Settings) -> tuple[date, date]:
     """Settlement dates are UK-local days; cover every half-hour in [window_start, window_end)."""
-    last_slot = s.window_end - timedelta(minutes=30)
-    return s.window_start.astimezone(LONDON).date(), last_slot.astimezone(LONDON).date()
+    return delivery_day(s.window_start), delivery_day(s.window_end - timedelta(minutes=30))
 
 
 async def fetch(
