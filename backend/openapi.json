@@ -20,6 +20,64 @@
         "title": "ActualHalfHour",
         "type": "object"
       },
+      "ByForecastLevelResponse": {
+        "properties": {
+          "bucket_mw": {
+            "title": "Bucket Mw",
+            "type": "integer"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ByForecastLevelRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "meta",
+          "bucket_mw",
+          "rows"
+        ],
+        "title": "ByForecastLevelResponse",
+        "type": "object"
+      },
+      "ByForecastLevelRow": {
+        "properties": {
+          "bias_mw": {
+            "title": "Bias Mw",
+            "type": "number"
+          },
+          "level_from_mw": {
+            "title": "Level From Mw",
+            "type": "integer"
+          },
+          "level_to_mw": {
+            "title": "Level To Mw",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "title": "Mae Mw",
+            "type": "number"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level_from_mw",
+          "level_to_mw",
+          "n",
+          "mae_mw",
+          "bias_mw"
+        ],
+        "title": "ByForecastLevelRow",
+        "type": "object"
+      },
       "ByHorizonResponse": {
         "properties": {
           "bucket_hours": {
@@ -949,6 +1007,142 @@
           }
         },
         "summary": "Metrics"
+      }
+    },
+    "/api/v1/metrics/by-forecast-level": {
+      "get": {
+        "operationId": "metrics_by_forecast_level_api_v1_metrics_by_forecast_level_get",
+        "parameters": [
+          {
+            "description": "ISO-8601 with offset, whole hour. Default: window start",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 with offset, whole hour. Default: window start",
+              "title": "From"
+            }
+          },
+          {
+            "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+              "title": "To"
+            }
+          },
+          {
+            "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+            "in": "query",
+            "name": "cutoff",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+              "title": "Cutoff"
+            }
+          },
+          {
+            "description": "Default: 0",
+            "in": "query",
+            "name": "lag_minutes",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: 0",
+              "title": "Lag Minutes"
+            }
+          },
+          {
+            "description": "Default: point",
+            "in": "query",
+            "name": "aggregation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "point",
+                    "hourly_mean"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: point",
+              "title": "Aggregation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByForecastLevelResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Metrics By Forecast Level"
       }
     },
     "/api/v1/metrics/by-horizon": {

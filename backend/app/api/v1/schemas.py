@@ -152,6 +152,20 @@ class ByHorizonResponse(_Model):
     rows: list[ByHorizonRow]
 
 
+class ByForecastLevelRow(_Model):
+    level_from_mw: int
+    level_to_mw: int
+    n: int
+    mae_mw: float
+    bias_mw: float
+
+
+class ByForecastLevelResponse(_Model):
+    meta: Meta
+    bucket_mw: int
+    rows: list[ByForecastLevelRow]
+
+
 class InternalError(_Model):
     detail: Literal["Internal error"]
     request_id: str
