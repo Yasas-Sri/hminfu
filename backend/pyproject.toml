@@ -1,0 +1,46 @@
+[project]
+name = "wind-decision-backend"
+version = "0.1.0"
+description = "FastAPI backend: decision-time wind forecasts vs actuals (Elexon FUELHH/WINDFOR)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "httpx>=0.28",
+    "pandas>=2.2",
+    "numpy>=2.1",
+    "uvicorn>=0.32",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pandas-stubs>=2.2",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "respx>=0.21",
+    "hypothesis>=6.120",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "DTZ", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+# Upstream: Starlette wants httpx2 for TestClient; httpx is our fixed client (AGENTS.md §2).
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
