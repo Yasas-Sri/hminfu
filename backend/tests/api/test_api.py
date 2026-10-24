@@ -172,6 +172,15 @@ def test_422_paths(client: TestClient, params: dict[str, object], field: str, ms
     assert msg in error["msg"]
 
 
+@pytest.mark.parametrize(
+    "path", ["/metrics", "/metrics/by-hour", "/metrics/by-forecast-level", "/metrics/by-horizon"]
+)
+def test_every_analytical_endpoint_validates_common_params(client: TestClient, path: str) -> None:
+    r = client.get(f"{API}{path}", params={"from": "2026-01-09T00:00:00"})
+    assert r.status_code == 422
+    assert r.json()["detail"][0]["loc"] == ["query", "from"]
+
+
 @pytest.mark.parametrize("bucket", [0, 25])
 def test_bad_bucket_hours(client: TestClient, bucket: int) -> None:
     r = client.get(f"{API}/metrics/by-horizon", params={"bucket_hours": bucket})
@@ -251,3 +260,14 @@ def test_range_over_62_days_is_rejected(tmp_path: Path) -> None:
     assert r.json()["detail"][0]["loc"] == ["query", "to"]
     assert "at most 62 days" in r.json()["detail"][0]["msg"]
     assert c.get(f"{API}/series", params={"to": "2026-03-04T00:00:00Z"}).status_code == 200
+
+
+def test_by_forecast_level_buckets_of_5_gw(client: TestClient) -> None:
+    body = client.get(f"{API}/metrics/by-forecast-level").json()
+    assert body["bucket_mw"] == 5000
+    assert body["meta"]["cutoff_applied"] is True
+    assert body["meta"]["coverage"]["target_hours"] == 48
+    rows = body["rows"]
+    assert sum(r["n"] for r in rows) == 48  # every ok hour lands in exactly one bucket
+    assert all(r["level_to_mw"] - r["level_from_mw"] == 5000 and r["n"] > 0 for r in rows)
+    assert set(rows[0]) == {"level_from_mw", "level_to_mw", "n", "mae_mw", "bias_mw"}

@@ -17,7 +17,10 @@
     "types": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts"
   },
   "dependencies": {
+    "@fontsource-variable/public-sans": "^5.3.0",
     "@tanstack/react-query": "^5.104.5",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

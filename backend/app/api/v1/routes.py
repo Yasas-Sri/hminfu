@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/v1", responses={500: {"model": s.InternalError}}
 
 # Contract limits (docs/API.md), not tunables.
 MAX_RANGE = timedelta(days=62)
+FORECAST_LEVEL_BUCKET_MW = 5000
 _HHMM = re.compile(r"^([01]\d|2[0-3]):([0-5]\d)$")
 
 
@@ -149,6 +150,17 @@ def metrics_by_hour(request: Request, svc: Svc, p: Query_) -> s.ByHourResponse:
     request.state.memo = _memo(hit)
     return s.ByHourResponse(
         meta=_meta(svc, p, cov), rows=[s.ByHourRow(**r) for r in _records(rows)]
+    )
+
+
+@router.get("/metrics/by-forecast-level", dependencies=[Depends(cacheable)])
+def metrics_by_forecast_level(request: Request, svc: Svc, p: Query_) -> s.ByForecastLevelResponse:
+    rows, cov, hit = svc.by_forecast_level(p, FORECAST_LEVEL_BUCKET_MW)
+    request.state.memo = _memo(hit)
+    return s.ByForecastLevelResponse(
+        meta=_meta(svc, p, cov),
+        bucket_mw=FORECAST_LEVEL_BUCKET_MW,
+        rows=[s.ByForecastLevelRow(**r) for r in _records(rows)],
     )
 
 

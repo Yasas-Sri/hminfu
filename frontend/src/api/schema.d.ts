@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/metrics/by-forecast-level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics By Forecast Level */
+        get: operations["metrics_by_forecast_level_api_v1_metrics_by_forecast_level_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/metrics/by-horizon": {
         parameters: {
             query?: never;
@@ -119,6 +136,27 @@ export interface components {
              * Format: date-time
              */
             start_time: string;
+        };
+        /** ByForecastLevelResponse */
+        ByForecastLevelResponse: {
+            /** Bucket Mw */
+            bucket_mw: number;
+            meta: components["schemas"]["Meta"];
+            /** Rows */
+            rows: components["schemas"]["ByForecastLevelRow"][];
+        };
+        /** ByForecastLevelRow */
+        ByForecastLevelRow: {
+            /** Bias Mw */
+            bias_mw: number;
+            /** Level From Mw */
+            level_from_mw: number;
+            /** Level To Mw */
+            level_to_mw: number;
+            /** Mae Mw */
+            mae_mw: number;
+            /** N */
+            n: number;
         };
         /** ByHorizonResponse */
         ByHorizonResponse: {
@@ -484,6 +522,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MetricsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    metrics_by_forecast_level_api_v1_metrics_by_forecast_level_get: {
+        parameters: {
+            query?: {
+                /** @description ISO-8601 with offset, whole hour. Default: window start */
+                from?: string | null;
+                /** @description Exclusive end, ISO-8601 with offset. Default: window end */
+                to?: string | null;
+                /** @description HH:MM, Europe/London on D−1. Default: 09:50 */
+                cutoff?: string | null;
+                /** @description Default: 0 */
+                lag_minutes?: number | null;
+                /** @description Default: point */
+                aggregation?: ("point" | "hourly_mean") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ByForecastLevelResponse"];
                 };
             };
             /** @description Validation Error */

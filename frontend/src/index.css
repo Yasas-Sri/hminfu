@@ -1,2 +1,52 @@
+@import '@fontsource-variable/public-sans';
 @import 'tailwindcss';
 @config "../tailwind.config.ts";
+
+@layer base {
+  html {
+    font-variant-numeric: tabular-nums;
+  }
+  body {
+    @apply bg-overcast text-ink font-sans text-body;
+  }
+  :focus-visible {
+    outline: 2px solid #13707b;
+    outline-offset: 2px;
+  }
+  dialog {
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+  dialog[open] {
+    opacity: 1;
+    @starting-style {
+      opacity: 0; /* lets the 120 ms fade run when the dialog appears */
+    }
+  }
+  dialog::backdrop {
+    background: transparent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after,
+    dialog {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+    }
+  }
+}
+
+/* The hindsight / no-data texture (DESIGN.md §2). Nothing else in the UI may use hatching. */
+.hatch {
+  background: repeating-linear-gradient(135deg, #8e999c 0 1px, transparent 1px 6px);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

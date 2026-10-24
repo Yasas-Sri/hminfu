@@ -68,6 +68,12 @@ class AnalysisService:
         rows, hit = self._cached(("by_hour", p), lambda: metrics.by_hour(frame))
         return rows, cov, hit
 
+    def by_forecast_level(self, p: Params, bucket_mw: int) -> tuple[pd.DataFrame, Coverage, bool]:
+        frame, cov, _ = self.decisions(p)
+        key = ("by_forecast_level", p, bucket_mw)
+        rows, hit = self._cached(key, lambda: metrics.by_forecast_level(frame, bucket_mw))
+        return rows, cov, hit
+
     def by_horizon(self, p: Params, bucket_hours: int) -> tuple[pd.DataFrame, int, bool]:
         """Uses every valid forecast regardless of cutoff and lag (ANALYSIS.md)."""
 
