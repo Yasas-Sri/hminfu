@@ -1,0 +1,91 @@
+{
+  "fetched_at": "2026-10-24T11:42:08Z",
+  "source_base_url": "https://data.elexon.co.uk/bmrs/api/v1",
+  "code_version": "c5abd39-dirty",
+  "ranges": {
+    "target": {
+      "from": "2026-01-02T00:00:00Z",
+      "to": "2026-02-02T00:00:00Z"
+    },
+    "forecast_publish": {
+      "from": "2025-12-29T00:00:00Z",
+      "to": "2026-02-02T00:00:00Z"
+    },
+    "actual_settlement_dates": {
+      "from": "2026-01-02",
+      "to": "2026-02-01"
+    }
+  },
+  "row_counts": {
+    "forecasts": 14383,
+    "actuals": 1488
+  },
+  "dropped": {
+    "forecast_past_echoes": 4201,
+    "forecast_identical_duplicates": 0,
+    "forecast_target_outside_window": 1856,
+    "actual_non_wind": 0,
+    "actual_superseded_or_duplicate": 0,
+    "actual_outside_window": 0
+  },
+  "publications_per_day": {
+    "2025-12-29": 8,
+    "2025-12-30": 8,
+    "2025-12-31": 8,
+    "2026-01-01": 8,
+    "2026-01-02": 8,
+    "2026-01-03": 8,
+    "2026-01-04": 8,
+    "2026-01-05": 8,
+    "2026-01-06": 8,
+    "2026-01-07": 8,
+    "2026-01-08": 8,
+    "2026-01-09": 8,
+    "2026-01-10": 8,
+    "2026-01-11": 8,
+    "2026-01-12": 8,
+    "2026-01-13": 8,
+    "2026-01-14": 8,
+    "2026-01-15": 8,
+    "2026-01-16": 8,
+    "2026-01-17": 8,
+    "2026-01-18": 8,
+    "2026-01-19": 8,
+    "2026-01-20": 8,
+    "2026-01-21": 8,
+    "2026-01-22": 8,
+    "2026-01-23": 8,
+    "2026-01-24": 8,
+    "2026-01-25": 8,
+    "2026-01-26": 8,
+    "2026-01-27": 8,
+    "2026-01-28": 8,
+    "2026-01-29": 8,
+    "2026-01-30": 8,
+    "2026-01-31": 8,
+    "2026-02-01": 8
+  },
+  "publish_time_of_day_histogram": {
+    "02:30": 35,
+    "04:30": 35,
+    "07:30": 35,
+    "09:30": 35,
+    "11:30": 34,
+    "12:25": 1,
+    "15:30": 35,
+    "18:30": 35,
+    "22:30": 35
+  },
+  "max_horizon_hours": 66.5,
+  "horizon_check": {
+    "lookback_hours": 96,
+    "margin_hours": 6
+  },
+  "actual_revisions": 0,
+  "conflicts": [],
+  "gaps": {
+    "missing_actual_half_hours": [],
+    "target_hours_without_forecast": [],
+    "unusual_publication_days": {}
+  }
+}

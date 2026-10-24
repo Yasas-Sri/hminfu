@@ -24,7 +24,7 @@ types:
 check: check-api check-web check-types
 
 check-api:
-	cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy app && uv run pytest -q
+	cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy app scripts && uv run pytest -q
 
 check-web:
 	cd frontend && npm run lint && npm run build && npm test
