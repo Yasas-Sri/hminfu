@@ -33,6 +33,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "DTZ", "SIM", "RUF"]
+allowed-confusables = ["−", "–"]  # true minus sign and en dash, as in docs/
 
 [tool.mypy]
 strict = true
