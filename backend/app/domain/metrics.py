@@ -45,6 +45,7 @@ class HeadlineMetrics:
     nmae: float | None
     error_quantiles_mw: Quantiles | None
     p90_over_forecast_mw: float | None
+    over_forecast_share: float | None  # share of hours with e > 0 (raw ratio)
     largest_over_forecast: Extreme | None
     largest_under_forecast: Extreme | None
 
@@ -54,7 +55,7 @@ def headline_metrics(frame: pd.DataFrame) -> HeadlineMetrics:
     ok = frame[frame["status"] == PointStatus.OK].sort_values("target_time")
     e = ok["error_mw"].to_numpy(dtype=float)
     if len(e) == 0:
-        return HeadlineMetrics(0, None, None, None, None, None, None, None, None)
+        return HeadlineMetrics(0, None, None, None, None, None, None, None, None, None)
     mean_actual = float(ok["actual_mw"].mean())
     p10, p50, p90 = (float(q) for q in np.quantile(e, [0.1, 0.5, 0.9], method="linear"))
     mae = float(np.mean(np.abs(e)))
@@ -66,6 +67,7 @@ def headline_metrics(frame: pd.DataFrame) -> HeadlineMetrics:
         nmae=mae / mean_actual if mean_actual > 0 else None,
         error_quantiles_mw=Quantiles(p10, p50, p90),
         p90_over_forecast_mw=max(0.0, p90),
+        over_forecast_share=float(np.mean(e > 0)),
         largest_over_forecast=_extreme(ok, positive=True),
         largest_under_forecast=_extreme(ok, positive=False),
     )
@@ -78,6 +80,21 @@ def by_hour(frame: pd.DataFrame) -> pd.DataFrame:
     out = stats.reindex(range(24)).rename_axis("hour_local").reset_index()
     out["n"] = out["n"].fillna(0).astype(int)
     return out.astype(object).where(out.notna(), None)
+
+
+def by_forecast_level(frame: pd.DataFrame, bucket_mw: int) -> pd.DataFrame:
+    """MAE and bias of `ok` hours grouped by the decision forecast's own level (MW).
+
+    Buckets are half-open [k·b, (k+1)·b); empty buckets are omitted. Diagnostic only: shows
+    whether the error depends on how much wind was forecast (DECISIONS.md, Data observations).
+    """
+    if bucket_mw < 1:
+        raise ValueError("bucket_mw must be >= 1")
+    ok = frame[frame["status"] == PointStatus.OK]
+    level = (ok["forecast_mw"] // bucket_mw * bucket_mw).astype(int)
+    stats = _mae_bias(ok["error_mw"], level).rename_axis("level_from_mw").reset_index()
+    stats.insert(1, "level_to_mw", stats["level_from_mw"] + bucket_mw)
+    return stats
 
 
 def by_horizon(

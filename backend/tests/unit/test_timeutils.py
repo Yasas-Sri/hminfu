@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from app.domain.timeutils import (
+    CutoffTimeError,
     cutoff_instant,
     cutoff_instants,
     delivery_day,
@@ -54,8 +55,9 @@ def test_t5_dst_safe_cutoff() -> None:
     "day", [date(2026, 3, 30), date(2026, 10, 26)]
 )  # gate 01:30 local on 29 Mar (gap) and 25 Oct (overlap)
 def test_cutoff_refuses_nonexistent_or_ambiguous_local_times(day: date) -> None:
-    with pytest.raises(ValueError, match="ambiguous or doesn't exist"):
+    with pytest.raises(CutoffTimeError, match=f"delivery day {day}.*outside 01:00–01:59") as err:
         cutoff_instant(day, time(1, 30))
+    assert err.value.delivery_day == day
 
 
 def test_vectorised_cutoffs_match_scalar() -> None:

@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from app.data.repository import read_rows, write_rows
+from app.data.repository import load_snapshot, read_rows, write_rows
 from app.data.validation import SnapshotValidationError
 
 
@@ -45,3 +45,13 @@ def test_unexpected_keys_are_rejected(tmp_path: Path) -> None:
     }
     with pytest.raises(SnapshotValidationError, match="expected"):
         read_rows(write_raw(tmp_path / "r.json.gz", [rec]))
+
+
+def test_load_snapshot_refuses_rows_that_disagree_with_the_manifest(tmp_path: Path) -> None:
+    for name in ("forecasts.json.gz", "actuals.json.gz"):
+        write_raw(tmp_path / name, [])
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"row_counts": {"forecasts": 1, "actuals": 0}})
+    )
+    with pytest.raises(SnapshotValidationError, match="manifest"):
+        load_snapshot(tmp_path)

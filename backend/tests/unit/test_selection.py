@@ -17,7 +17,7 @@ from app.domain.selection import (
     eligible_forecasts,
     valid_forecasts,
 )
-from app.domain.timeutils import target_grid
+from app.domain.timeutils import CutoffTimeError, target_grid
 from tests.builders import actuals, forecasts, ts
 
 GATE = time(9, 50)
@@ -172,3 +172,9 @@ def test_decision_frame_requires_the_same_grid() -> None:
     other = hourly_actuals(actuals(), grid("2026-01-11T00:00Z", 2), "point")
     with pytest.raises(ValueError, match="same target grid"):
         decision_frame(decisions, other)
+
+
+def test_invalid_cutoff_fails_for_every_grid_day_even_without_forecasts() -> None:
+    """Cutoff validity depends on the grid, not on which days happen to have data."""
+    with pytest.raises(CutoffTimeError, match="delivery day 2026-03-30"):
+        decision_forecasts(forecasts(), grid("2026-03-30T00:00Z", 1), time(1, 30), LAG0)

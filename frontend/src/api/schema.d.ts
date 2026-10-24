@@ -21,17 +21,374 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Meta */
+        get: operations["meta_api_v1_meta_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics */
+        get: operations["metrics_api_v1_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/by-horizon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics By Horizon */
+        get: operations["metrics_by_horizon_api_v1_metrics_by_horizon_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/by-hour": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics By Hour */
+        get: operations["metrics_by_hour_api_v1_metrics_by_hour_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Series */
+        get: operations["series_api_v1_series_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActualHalfHour */
+        ActualHalfHour: {
+            /** Actual Mw */
+            actual_mw: number;
+            /**
+             * Start Time
+             * Format: date-time
+             */
+            start_time: string;
+        };
+        /** ByHorizonResponse */
+        ByHorizonResponse: {
+            /** Bucket Hours */
+            bucket_hours: number;
+            meta: components["schemas"]["Meta"];
+            /** Rows */
+            rows: components["schemas"]["ByHorizonRow"][];
+            /** Rows Used */
+            rows_used: number;
+        };
+        /** ByHorizonRow */
+        ByHorizonRow: {
+            /** Bias Mw */
+            bias_mw: number;
+            /** Horizon From H */
+            horizon_from_h: number;
+            /** Horizon To H */
+            horizon_to_h: number;
+            /** Mae Mw */
+            mae_mw: number;
+            /** N */
+            n: number;
+        };
+        /** ByHourResponse */
+        ByHourResponse: {
+            meta: components["schemas"]["Meta"];
+            /** Rows */
+            rows: components["schemas"]["ByHourRow"][];
+        };
+        /** ByHourRow */
+        ByHourRow: {
+            /** Bias Mw */
+            bias_mw: number | null;
+            /** Hour Local */
+            hour_local: number;
+            /** Mae Mw */
+            mae_mw: number | null;
+            /** N */
+            n: number;
+        };
+        /**
+         * Coverage
+         * @description Mutually exclusive status counts; they always sum to `target_hours`.
+         */
+        Coverage: {
+            /** Missing Actual */
+            missing_actual: number;
+            /** Missing Both */
+            missing_both: number;
+            /** Missing Forecast */
+            missing_forecast: number;
+            /** Ok */
+            ok: number;
+            /** Target Hours */
+            target_hours: number;
+        };
+        /** Defaults */
+        Defaults: {
+            /**
+             * Aggregation
+             * @enum {string}
+             */
+            aggregation: "point" | "hourly_mean";
+            /** Cutoff Local */
+            cutoff_local: string;
+            /** Publish Lag Minutes */
+            publish_lag_minutes: number;
+        };
+        /** Extreme */
+        Extreme: {
+            /** Error Mw */
+            error_mw: number;
+            /**
+             * Target Time
+             * Format: date-time
+             */
+            target_time: string;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /** HealthResponse */
         HealthResponse: {
+            snapshot: components["schemas"]["SnapshotSummary"];
             /**
              * Status
              * @constant
              */
             status: "ok";
+        };
+        /** InternalError */
+        InternalError: {
+            /**
+             * Detail
+             * @constant
+             */
+            detail: "Internal error";
+            /** Request Id */
+            request_id: string;
+        };
+        /**
+         * Meta
+         * @description Echo of the parameters behind an analytical response (ADR-011).
+         */
+        Meta: {
+            /**
+             * Aggregation
+             * @enum {string}
+             */
+            aggregation: "point" | "hourly_mean";
+            coverage: components["schemas"]["Coverage"] | null;
+            /** Cutoff Applied */
+            cutoff_applied: boolean;
+            /** Cutoff Local */
+            cutoff_local: string;
+            /**
+             * Cutoff Timezone
+             * @constant
+             */
+            cutoff_timezone: "Europe/London";
+            /**
+             * Data As Of
+             * Format: date-time
+             */
+            data_as_of: string;
+            /**
+             * From
+             * Format: date-time
+             */
+            from: string;
+            /** Publish Lag Minutes */
+            publish_lag_minutes: number;
+            /**
+             * To
+             * Format: date-time
+             */
+            to: string;
+        };
+        /** MetaResponse */
+        MetaResponse: {
+            /**
+             * Data As Of
+             * Format: date-time
+             */
+            data_as_of: string;
+            default_window: components["schemas"]["TimeRange"];
+            defaults: components["schemas"]["Defaults"];
+            publications_per_day: components["schemas"]["PublicationsPerDay"];
+            /**
+             * Sign Convention
+             * @constant
+             */
+            sign_convention: "error = forecast − actual (MW)";
+            supported_target_range: components["schemas"]["TimeRange"];
+        };
+        /** MetricsResponse */
+        MetricsResponse: {
+            /** Bias Mw */
+            bias_mw: number | null;
+            error_quantiles_mw: components["schemas"]["Quantiles"] | null;
+            largest_over_forecast: components["schemas"]["Extreme"] | null;
+            largest_under_forecast: components["schemas"]["Extreme"] | null;
+            /** Mae Mw */
+            mae_mw: number | null;
+            meta: components["schemas"]["Meta"];
+            /** N */
+            n: number;
+            /** Nmae */
+            nmae: number | null;
+            /** Over Forecast Share */
+            over_forecast_share: number | null;
+            /** P90 Over Forecast Mw */
+            p90_over_forecast_mw: number | null;
+            /** Rmse Mw */
+            rmse_mw: number | null;
+        };
+        /** PublicationsPerDay */
+        PublicationsPerDay: {
+            /** Max */
+            max: number;
+            /** Median */
+            median: number;
+            /** Min */
+            min: number;
+        };
+        /** Quantiles */
+        Quantiles: {
+            /** P10 */
+            p10: number;
+            /** P50 */
+            p50: number;
+            /** P90 */
+            p90: number;
+        };
+        /** SeriesPoint */
+        SeriesPoint: {
+            /** Actual Mw */
+            actual_mw: number | null;
+            /**
+             * Error Mw
+             * @description forecast − actual (MW); only when status is ok
+             */
+            error_mw: number | null;
+            /** Forecast Mw */
+            forecast_mw: number | null;
+            /** Forecast Publish Time */
+            forecast_publish_time: string | null;
+            /** Horizon Hours */
+            horizon_hours: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "missing_actual" | "missing_forecast" | "missing_both";
+            /**
+             * Target Time
+             * Format: date-time
+             */
+            target_time: string;
+        };
+        /** SeriesResponse */
+        SeriesResponse: {
+            /** Actuals Halfhourly */
+            actuals_halfhourly: components["schemas"]["ActualHalfHour"][];
+            meta: components["schemas"]["Meta"];
+            /** Points */
+            points: components["schemas"]["SeriesPoint"][];
+        };
+        /** SnapshotSummary */
+        SnapshotSummary: {
+            /** Actual Rows */
+            actual_rows: number;
+            /** Conflicts */
+            conflicts: number;
+            /**
+             * Fetched At
+             * Format: date-time
+             */
+            fetched_at: string;
+            /** Forecast Rows */
+            forecast_rows: number;
+        };
+        /** TimeRange */
+        TimeRange: {
+            /**
+             * From
+             * Format: date-time
+             */
+            from: string;
+            /**
+             * To
+             * Format: date-time
+             */
+            to: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
         };
     };
     responses: never;
@@ -58,6 +415,241 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    meta_api_v1_meta_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetaResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    metrics_api_v1_metrics_get: {
+        parameters: {
+            query?: {
+                /** @description ISO-8601 with offset, whole hour. Default: window start */
+                from?: string | null;
+                /** @description Exclusive end, ISO-8601 with offset. Default: window end */
+                to?: string | null;
+                /** @description HH:MM, Europe/London on D−1. Default: 09:50 */
+                cutoff?: string | null;
+                /** @description Default: 0 */
+                lag_minutes?: number | null;
+                /** @description Default: point */
+                aggregation?: ("point" | "hourly_mean") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    metrics_by_horizon_api_v1_metrics_by_horizon_get: {
+        parameters: {
+            query?: {
+                bucket_hours?: number;
+                /** @description ISO-8601 with offset, whole hour. Default: window start */
+                from?: string | null;
+                /** @description Exclusive end, ISO-8601 with offset. Default: window end */
+                to?: string | null;
+                /** @description HH:MM, Europe/London on D−1. Default: 09:50 */
+                cutoff?: string | null;
+                /** @description Default: 0 */
+                lag_minutes?: number | null;
+                /** @description Default: point */
+                aggregation?: ("point" | "hourly_mean") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ByHorizonResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    metrics_by_hour_api_v1_metrics_by_hour_get: {
+        parameters: {
+            query?: {
+                /** @description ISO-8601 with offset, whole hour. Default: window start */
+                from?: string | null;
+                /** @description Exclusive end, ISO-8601 with offset. Default: window end */
+                to?: string | null;
+                /** @description HH:MM, Europe/London on D−1. Default: 09:50 */
+                cutoff?: string | null;
+                /** @description Default: 0 */
+                lag_minutes?: number | null;
+                /** @description Default: point */
+                aggregation?: ("point" | "hourly_mean") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ByHourResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
+                };
+            };
+        };
+    };
+    series_api_v1_series_get: {
+        parameters: {
+            query?: {
+                /** @description ISO-8601 with offset, whole hour. Default: window start */
+                from?: string | null;
+                /** @description Exclusive end, ISO-8601 with offset. Default: window end */
+                to?: string | null;
+                /** @description HH:MM, Europe/London on D−1. Default: 09:50 */
+                cutoff?: string | null;
+                /** @description Default: 0 */
+                lag_minutes?: number | null;
+                /** @description Default: point */
+                aggregation?: ("point" | "hourly_mean") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalError"];
                 };
             };
         };

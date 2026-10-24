@@ -12,6 +12,12 @@
     "forecasts": 928,
     "actuals": 96
   },
+  "publications_per_day": {
+    "2026-01-07": 8,
+    "2026-01-08": 8,
+    "2026-01-09": 8,
+    "2026-01-10": 8
+  },
   "conflicts": [],
   "gaps": {
     "missing_actual_half_hours": [],

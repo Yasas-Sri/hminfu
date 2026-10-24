@@ -8,6 +8,18 @@ import pandas as pd
 LONDON = ZoneInfo("Europe/London")
 
 
+class CutoffTimeError(ValueError):
+    """The gate time doesn't exist or happens twice on the day before `delivery_day` (DST)."""
+
+    def __init__(self, delivery_day: date, gate_closure_local: time) -> None:
+        self.delivery_day = delivery_day
+        super().__init__(
+            f"cutoff {gate_closure_local:%H:%M} doesn't exist or happens twice in UK time on "
+            f"{delivery_day - timedelta(days=1)}, the day before delivery day {delivery_day} "
+            "(clock change). Choose a cutoff outside 01:00–01:59."
+        )
+
+
 def target_grid(start: datetime, end: datetime) -> pd.DatetimeIndex:
     """Every whole UTC hour in [start, end), built from the bounds alone.
 
@@ -43,9 +55,7 @@ def cutoff_instant(day: date, gate_closure_local: time) -> datetime:
     """
     local = datetime.combine(day - timedelta(days=1), gate_closure_local, tzinfo=LONDON)
     if local.utcoffset() != local.replace(fold=1).utcoffset():
-        raise ValueError(
-            f"{gate_closure_local} on {local.date()} is ambiguous or doesn't exist in UK time"
-        )
+        raise CutoffTimeError(day, gate_closure_local)
     return local.astimezone(UTC)
 
 

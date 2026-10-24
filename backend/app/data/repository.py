@@ -1,17 +1,46 @@
-"""Snapshot row files: gzipped JSON records `{publish_time, start_time, generation}`, UTC `Z`.
+"""The committed snapshot: file format and loading.
 
-Defined once here, so ingest (writer) and the API (reader, M3) can't drift apart.
+Row files are gzipped JSON records `{publish_time, start_time, generation}` with UTC `Z` times.
+Defined once here, so ingest (writer) and the API (reader) can't drift apart.
 """
 
 import gzip
 import json
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
 from app.data.validation import COLUMNS, SnapshotValidationError
 
 _TIME_COLUMNS = ("publish_time", "start_time")
+
+
+@dataclass(frozen=True)
+class Snapshot:
+    forecasts: pd.DataFrame
+    actuals: pd.DataFrame
+    manifest: dict[str, Any]
+
+
+def load_snapshot(snapshot_dir: Path) -> Snapshot:
+    """Read the three snapshot files. Fails if the rows don't match the manifest's counts.
+
+    Called once per process (create_app); request-time code never re-reads files or the network.
+    """
+    manifest = json.loads((snapshot_dir / "manifest.json").read_text())
+    snap = Snapshot(
+        read_rows(snapshot_dir / "forecasts.json.gz"),
+        read_rows(snapshot_dir / "actuals.json.gz"),
+        manifest,
+    )
+    loaded = {"forecasts": len(snap.forecasts), "actuals": len(snap.actuals)}
+    if loaded != manifest["row_counts"]:
+        raise SnapshotValidationError(f"rows {loaded} != manifest {manifest['row_counts']}")
+    return snap
+
+
 _FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 

@@ -8,6 +8,7 @@ import pytest
 from app.domain.metrics import (
     Extreme,
     Quantiles,
+    by_forecast_level,
     by_horizon,
     by_hour,
     headline_metrics,
@@ -50,6 +51,7 @@ def test_headline_hand_computed() -> None:
         p10=pytest.approx(-1631.5), p50=pytest.approx(-1147.0), p90=pytest.approx(-126.3)
     )
     assert m.p90_over_forecast_mw == 0.0  # p90 < 0 is clamped
+    assert m.over_forecast_share == 0.25  # 1 of 4 hours
     assert m.largest_over_forecast == Extreme(168.0, ts("2026-01-10T00:00Z").to_pydatetime())
     assert m.largest_under_forecast == Extreme(-1696.0, ts("2026-01-10T03:00Z").to_pydatetime())
 
@@ -63,6 +65,7 @@ def test_extremes_absent_for_missing_sign() -> None:
     assert headline_metrics(ok_frame([-5, -1])).largest_over_forecast is None
     m = headline_metrics(ok_frame([0]))
     assert (m.mae_mw, m.largest_over_forecast, m.largest_under_forecast) == (0.0, None, None)
+    assert m.over_forecast_share == 0.0  # an exact forecast is not "over"
 
 
 def test_extreme_ties_take_earliest_target() -> None:
@@ -131,3 +134,25 @@ def test_by_horizon_rejects_echoes_and_bad_bucket() -> None:
         by_horizon(echo, actual, bucket_hours=6)
     with pytest.raises(ValueError, match="bucket_hours"):
         by_horizon(forecasts(), actual, bucket_hours=0)
+
+
+def test_by_forecast_level_half_open_buckets_ok_only_skip_empty() -> None:
+    frame = pd.DataFrame(
+        {
+            "target_time": pd.date_range("2026-01-10T00:00Z", periods=5, freq="h"),
+            "status": ["ok", "ok", "ok", "ok", "missing_actual"],
+            "forecast_mw": [0.0, 4999.0, 5000.0, 12000.0, 3000.0],
+            "actual_mw": [0.0, 4000.0, 6000.0, 11000.0, float("nan")],
+            "error_mw": [0.0, 999.0, -1000.0, 1000.0, float("nan")],
+        }
+    )
+    assert by_forecast_level(frame, bucket_mw=5000).to_dict("records") == [
+        {"level_from_mw": 0, "level_to_mw": 5000, "n": 2, "mae_mw": 499.5, "bias_mw": 499.5},
+        {"level_from_mw": 5000, "level_to_mw": 10000, "n": 1, "mae_mw": 1000.0, "bias_mw": -1000.0},
+        {"level_from_mw": 10000, "level_to_mw": 15000, "n": 1, "mae_mw": 1000.0, "bias_mw": 1000.0},
+    ]  # 5,000 MW exactly falls in [5000, 10000); the missing_actual hour is ignored
+
+
+def test_by_forecast_level_rejects_bad_bucket() -> None:
+    with pytest.raises(ValueError, match="bucket_mw"):
+        by_forecast_level(ok_frame([1.0]), bucket_mw=0)

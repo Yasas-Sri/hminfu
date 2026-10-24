@@ -15,28 +15,19 @@ import statistics
 import subprocess
 import sys
 import tempfile
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import httpx
-import pandas as pd
 
 from app.config import Settings
 from app.data import validation as v
 from app.data.elexon_client import ElexonClient, Row
-from app.data.repository import read_rows, write_rows
+from app.data.repository import Snapshot, read_rows, write_rows
 from app.domain.timeutils import delivery_day
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "snapshot"
-
-
-@dataclass(frozen=True)
-class Snapshot:
-    forecasts: pd.DataFrame
-    actuals: pd.DataFrame
-    manifest: dict[str, Any]
 
 
 def forecast_publish_range(s: Settings) -> tuple[datetime, datetime]:
@@ -184,6 +175,7 @@ def cut_fixture(src: Path, out: Path, start: datetime, end: datetime) -> None:
         "code_version": source["code_version"],
         "ranges": {"target": {"from": _iso(start), "to": _iso(end)}},
         "row_counts": {"forecasts": len(fc), "actuals": len(act)},
+        "publications_per_day": v.publications_per_day(fc),  # runs with rows in this cut
         "conflicts": [],  # conflicting keys never reach the snapshot rows
         "gaps": {
             k: in_range(gaps[k])

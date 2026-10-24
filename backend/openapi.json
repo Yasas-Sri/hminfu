@@ -1,8 +1,248 @@
 {
   "components": {
     "schemas": {
+      "ActualHalfHour": {
+        "properties": {
+          "actual_mw": {
+            "title": "Actual Mw",
+            "type": "number"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_time",
+          "actual_mw"
+        ],
+        "title": "ActualHalfHour",
+        "type": "object"
+      },
+      "ByHorizonResponse": {
+        "properties": {
+          "bucket_hours": {
+            "title": "Bucket Hours",
+            "type": "integer"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ByHorizonRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "rows_used": {
+            "title": "Rows Used",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "meta",
+          "bucket_hours",
+          "rows_used",
+          "rows"
+        ],
+        "title": "ByHorizonResponse",
+        "type": "object"
+      },
+      "ByHorizonRow": {
+        "properties": {
+          "bias_mw": {
+            "title": "Bias Mw",
+            "type": "number"
+          },
+          "horizon_from_h": {
+            "title": "Horizon From H",
+            "type": "integer"
+          },
+          "horizon_to_h": {
+            "title": "Horizon To H",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "title": "Mae Mw",
+            "type": "number"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "horizon_from_h",
+          "horizon_to_h",
+          "n",
+          "mae_mw",
+          "bias_mw"
+        ],
+        "title": "ByHorizonRow",
+        "type": "object"
+      },
+      "ByHourResponse": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ByHourRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "meta",
+          "rows"
+        ],
+        "title": "ByHourResponse",
+        "type": "object"
+      },
+      "ByHourRow": {
+        "properties": {
+          "bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bias Mw"
+          },
+          "hour_local": {
+            "title": "Hour Local",
+            "type": "integer"
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "hour_local",
+          "n",
+          "mae_mw",
+          "bias_mw"
+        ],
+        "title": "ByHourRow",
+        "type": "object"
+      },
+      "Coverage": {
+        "description": "Mutually exclusive status counts; they always sum to `target_hours`.",
+        "properties": {
+          "missing_actual": {
+            "title": "Missing Actual",
+            "type": "integer"
+          },
+          "missing_both": {
+            "title": "Missing Both",
+            "type": "integer"
+          },
+          "missing_forecast": {
+            "title": "Missing Forecast",
+            "type": "integer"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "integer"
+          },
+          "target_hours": {
+            "title": "Target Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "target_hours",
+          "ok",
+          "missing_actual",
+          "missing_forecast",
+          "missing_both"
+        ],
+        "title": "Coverage",
+        "type": "object"
+      },
+      "Defaults": {
+        "properties": {
+          "aggregation": {
+            "enum": [
+              "point",
+              "hourly_mean"
+            ],
+            "title": "Aggregation",
+            "type": "string"
+          },
+          "cutoff_local": {
+            "title": "Cutoff Local",
+            "type": "string"
+          },
+          "publish_lag_minutes": {
+            "title": "Publish Lag Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cutoff_local",
+          "publish_lag_minutes",
+          "aggregation"
+        ],
+        "title": "Defaults",
+        "type": "object"
+      },
+      "Extreme": {
+        "properties": {
+          "error_mw": {
+            "title": "Error Mw",
+            "type": "number"
+          },
+          "target_time": {
+            "format": "date-time",
+            "title": "Target Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_mw",
+          "target_time"
+        ],
+        "title": "Extreme",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
       "HealthResponse": {
         "properties": {
+          "snapshot": {
+            "$ref": "#/components/schemas/SnapshotSummary"
+          },
           "status": {
             "const": "ok",
             "title": "Status",
@@ -10,9 +250,505 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "snapshot"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "InternalError": {
+        "properties": {
+          "detail": {
+            "const": "Internal error",
+            "title": "Detail",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail",
+          "request_id"
+        ],
+        "title": "InternalError",
+        "type": "object"
+      },
+      "Meta": {
+        "description": "Echo of the parameters behind an analytical response (ADR-011).",
+        "properties": {
+          "aggregation": {
+            "enum": [
+              "point",
+              "hourly_mean"
+            ],
+            "title": "Aggregation",
+            "type": "string"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coverage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cutoff_applied": {
+            "title": "Cutoff Applied",
+            "type": "boolean"
+          },
+          "cutoff_local": {
+            "title": "Cutoff Local",
+            "type": "string"
+          },
+          "cutoff_timezone": {
+            "const": "Europe/London",
+            "title": "Cutoff Timezone",
+            "type": "string"
+          },
+          "data_as_of": {
+            "format": "date-time",
+            "title": "Data As Of",
+            "type": "string"
+          },
+          "from": {
+            "format": "date-time",
+            "title": "From",
+            "type": "string"
+          },
+          "publish_lag_minutes": {
+            "title": "Publish Lag Minutes",
+            "type": "integer"
+          },
+          "to": {
+            "format": "date-time",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "cutoff_local",
+          "cutoff_timezone",
+          "publish_lag_minutes",
+          "aggregation",
+          "cutoff_applied",
+          "data_as_of",
+          "coverage"
+        ],
+        "title": "Meta",
+        "type": "object"
+      },
+      "MetaResponse": {
+        "properties": {
+          "data_as_of": {
+            "format": "date-time",
+            "title": "Data As Of",
+            "type": "string"
+          },
+          "default_window": {
+            "$ref": "#/components/schemas/TimeRange"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/Defaults"
+          },
+          "publications_per_day": {
+            "$ref": "#/components/schemas/PublicationsPerDay"
+          },
+          "sign_convention": {
+            "const": "error = forecast \u2212 actual (MW)",
+            "title": "Sign Convention",
+            "type": "string"
+          },
+          "supported_target_range": {
+            "$ref": "#/components/schemas/TimeRange"
+          }
+        },
+        "required": [
+          "supported_target_range",
+          "default_window",
+          "defaults",
+          "data_as_of",
+          "publications_per_day",
+          "sign_convention"
+        ],
+        "title": "MetaResponse",
+        "type": "object"
+      },
+      "MetricsResponse": {
+        "properties": {
+          "bias_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bias Mw"
+          },
+          "error_quantiles_mw": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Quantiles"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "largest_over_forecast": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Extreme"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "largest_under_forecast": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Extreme"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mae_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae Mw"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "nmae": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nmae"
+          },
+          "over_forecast_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over Forecast Share"
+          },
+          "p90_over_forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90 Over Forecast Mw"
+          },
+          "rmse_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rmse Mw"
+          }
+        },
+        "required": [
+          "meta",
+          "n",
+          "mae_mw",
+          "rmse_mw",
+          "bias_mw",
+          "nmae",
+          "error_quantiles_mw",
+          "p90_over_forecast_mw",
+          "over_forecast_share",
+          "largest_over_forecast",
+          "largest_under_forecast"
+        ],
+        "title": "MetricsResponse",
+        "type": "object"
+      },
+      "PublicationsPerDay": {
+        "properties": {
+          "max": {
+            "title": "Max",
+            "type": "integer"
+          },
+          "median": {
+            "title": "Median",
+            "type": "number"
+          },
+          "min": {
+            "title": "Min",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "min",
+          "median",
+          "max"
+        ],
+        "title": "PublicationsPerDay",
+        "type": "object"
+      },
+      "Quantiles": {
+        "properties": {
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p50": {
+            "title": "P50",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "title": "Quantiles",
+        "type": "object"
+      },
+      "SeriesPoint": {
+        "properties": {
+          "actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Mw"
+          },
+          "error_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "forecast \u2212 actual (MW); only when status is ok",
+            "title": "Error Mw"
+          },
+          "forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Mw"
+          },
+          "forecast_publish_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Publish Time"
+          },
+          "horizon_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon Hours"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "missing_actual",
+              "missing_forecast",
+              "missing_both"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "target_time": {
+            "format": "date-time",
+            "title": "Target Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_time",
+          "status",
+          "actual_mw",
+          "forecast_mw",
+          "forecast_publish_time",
+          "horizon_hours",
+          "error_mw"
+        ],
+        "title": "SeriesPoint",
+        "type": "object"
+      },
+      "SeriesResponse": {
+        "properties": {
+          "actuals_halfhourly": {
+            "items": {
+              "$ref": "#/components/schemas/ActualHalfHour"
+            },
+            "title": "Actuals Halfhourly",
+            "type": "array"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "meta",
+          "points",
+          "actuals_halfhourly"
+        ],
+        "title": "SeriesResponse",
+        "type": "object"
+      },
+      "SnapshotSummary": {
+        "properties": {
+          "actual_rows": {
+            "title": "Actual Rows",
+            "type": "integer"
+          },
+          "conflicts": {
+            "title": "Conflicts",
+            "type": "integer"
+          },
+          "fetched_at": {
+            "format": "date-time",
+            "title": "Fetched At",
+            "type": "string"
+          },
+          "forecast_rows": {
+            "title": "Forecast Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fetched_at",
+          "forecast_rows",
+          "actual_rows",
+          "conflicts"
+        ],
+        "title": "SnapshotSummary",
+        "type": "object"
+      },
+      "TimeRange": {
+        "properties": {
+          "from": {
+            "format": "date-time",
+            "title": "From",
+            "type": "string"
+          },
+          "to": {
+            "format": "date-time",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "title": "TimeRange",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
         "type": "object"
       }
     }
@@ -36,9 +772,603 @@
               }
             },
             "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
           }
         },
         "summary": "Health"
+      }
+    },
+    "/api/v1/meta": {
+      "get": {
+        "operationId": "meta_api_v1_meta_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Meta"
+      }
+    },
+    "/api/v1/metrics": {
+      "get": {
+        "operationId": "metrics_api_v1_metrics_get",
+        "parameters": [
+          {
+            "description": "ISO-8601 with offset, whole hour. Default: window start",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 with offset, whole hour. Default: window start",
+              "title": "From"
+            }
+          },
+          {
+            "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+              "title": "To"
+            }
+          },
+          {
+            "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+            "in": "query",
+            "name": "cutoff",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+              "title": "Cutoff"
+            }
+          },
+          {
+            "description": "Default: 0",
+            "in": "query",
+            "name": "lag_minutes",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: 0",
+              "title": "Lag Minutes"
+            }
+          },
+          {
+            "description": "Default: point",
+            "in": "query",
+            "name": "aggregation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "point",
+                    "hourly_mean"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: point",
+              "title": "Aggregation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Metrics"
+      }
+    },
+    "/api/v1/metrics/by-horizon": {
+      "get": {
+        "operationId": "metrics_by_horizon_api_v1_metrics_by_horizon_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "bucket_hours",
+            "required": false,
+            "schema": {
+              "default": 6,
+              "maximum": 24,
+              "minimum": 1,
+              "title": "Bucket Hours",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "ISO-8601 with offset, whole hour. Default: window start",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 with offset, whole hour. Default: window start",
+              "title": "From"
+            }
+          },
+          {
+            "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+              "title": "To"
+            }
+          },
+          {
+            "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+            "in": "query",
+            "name": "cutoff",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+              "title": "Cutoff"
+            }
+          },
+          {
+            "description": "Default: 0",
+            "in": "query",
+            "name": "lag_minutes",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: 0",
+              "title": "Lag Minutes"
+            }
+          },
+          {
+            "description": "Default: point",
+            "in": "query",
+            "name": "aggregation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "point",
+                    "hourly_mean"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: point",
+              "title": "Aggregation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByHorizonResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Metrics By Horizon"
+      }
+    },
+    "/api/v1/metrics/by-hour": {
+      "get": {
+        "operationId": "metrics_by_hour_api_v1_metrics_by_hour_get",
+        "parameters": [
+          {
+            "description": "ISO-8601 with offset, whole hour. Default: window start",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 with offset, whole hour. Default: window start",
+              "title": "From"
+            }
+          },
+          {
+            "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+              "title": "To"
+            }
+          },
+          {
+            "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+            "in": "query",
+            "name": "cutoff",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+              "title": "Cutoff"
+            }
+          },
+          {
+            "description": "Default: 0",
+            "in": "query",
+            "name": "lag_minutes",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: 0",
+              "title": "Lag Minutes"
+            }
+          },
+          {
+            "description": "Default: point",
+            "in": "query",
+            "name": "aggregation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "point",
+                    "hourly_mean"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: point",
+              "title": "Aggregation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByHourResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Metrics By Hour"
+      }
+    },
+    "/api/v1/series": {
+      "get": {
+        "operationId": "series_api_v1_series_get",
+        "parameters": [
+          {
+            "description": "ISO-8601 with offset, whole hour. Default: window start",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 with offset, whole hour. Default: window start",
+              "title": "From"
+            }
+          },
+          {
+            "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exclusive end, ISO-8601 with offset. Default: window end",
+              "title": "To"
+            }
+          },
+          {
+            "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+            "in": "query",
+            "name": "cutoff",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "HH:MM, Europe/London on D\u22121. Default: 09:50",
+              "title": "Cutoff"
+            }
+          },
+          {
+            "description": "Default: 0",
+            "in": "query",
+            "name": "lag_minutes",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: 0",
+              "title": "Lag Minutes"
+            }
+          },
+          {
+            "description": "Default: point",
+            "in": "query",
+            "name": "aggregation",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "point",
+                    "hourly_mean"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Default: point",
+              "title": "Aggregation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Series"
       }
     }
   }

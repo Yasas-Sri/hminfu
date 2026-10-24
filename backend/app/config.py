@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     # Ingest fails unless forecast_lookback_hours > max observed horizon + this margin.
     horizon_margin_hours: int = Field(6, ge=0)
 
+    memo_size: int = Field(256, ge=1)  # memoised analysis results per process
+
     snapshot_dir: Path = Path(__file__).resolve().parents[1] / "data" / "snapshot"
 
     @model_validator(mode="after")

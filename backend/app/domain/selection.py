@@ -34,8 +34,10 @@ def eligible_forecasts(
     """
     if publish_lag < timedelta(0):
         raise ValueError("publish lag must be >= 0: a negative lag would admit post-cutoff runs")
+    # Cutoffs come from the grid, so an invalid gate time fails even on days with no rows.
+    by_target = cutoff_instants(targets.to_series(), gate_closure_local)
     fc = valid_forecasts(forecasts, targets)
-    cutoff = cutoff_instants(fc["start_time"], gate_closure_local)
+    cutoff = fc["start_time"].map(by_target)
     return fc[fc["publish_time"] + publish_lag <= cutoff]
 
 
